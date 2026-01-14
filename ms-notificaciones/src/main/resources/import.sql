@@ -1,0 +1,1 @@
+-- Tabla de logs inicia vacía.

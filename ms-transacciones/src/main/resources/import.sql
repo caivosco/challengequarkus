@@ -1,0 +1,1 @@
+-- Tabla de transacciones inicia vacía. Se llenará con el uso.

@@ -1,0 +1,66 @@
+version: '3.8'
+
+services:
+  # --- 4 BASES DE DATOS INDEPENDIENTES ---
+  # Usamos puertos distintos para simular servidores físicos distintos
+  db-clientes:
+    image: postgres:15
+    container_name: db_clientes
+    environment:
+      POSTGRES_USER: usr_cli
+      POSTGRES_PASSWORD: pwd_cli
+      POSTGRES_DB: clientes_db
+    ports: ["5431:5432"]
+    volumes: [vol_cli:/var/lib/postgresql/data]
+
+  db-cuentas:
+    image: postgres:15
+    container_name: db_cuentas
+    environment:
+      POSTGRES_USER: usr_cta
+      POSTGRES_PASSWORD: pwd_cta
+      POSTGRES_DB: cuentas_db
+    ports: ["5432:5432"]
+    volumes: [vol_cta:/var/lib/postgresql/data]
+
+  db-transacciones:
+    image: postgres:15
+    container_name: db_transacciones
+    environment:
+      POSTGRES_USER: usr_trx
+      POSTGRES_PASSWORD: pwd_trx
+      POSTGRES_DB: transacciones_db
+    ports: ["5433:5432"]
+    volumes: [vol_trx:/var/lib/postgresql/data]
+
+  db-notificaciones:
+    image: postgres:15
+    container_name: db_notificaciones
+    environment:
+      POSTGRES_USER: usr_not
+      POSTGRES_PASSWORD: pwd_not
+      POSTGRES_DB: notificaciones_db
+    ports: ["5434:5432"]
+    volumes: [vol_not:/var/lib/postgresql/data]
+
+  # --- BROKER DE EVENTOS ---
+  redpanda:
+    image: docker.redpanda.com/redpandadata/redpanda:v23.2.1
+    container_name: broker_kafka
+    command:
+      - redpanda start
+      - --smp 1  
+      - --memory 1G 
+      - --reserve-memory 0M
+      - --overprovisioned
+      - --node-id 0
+      - --check=false
+      - --kafka-addr PLAINTEXT://0.0.0.0:29092,OUTSIDE://0.0.0.0:9092
+      - --advertise-kafka-addr PLAINTEXT://redpanda:29092,OUTSIDE://localhost:9092
+    ports: ["9092:9092"]
+
+volumes:
+  vol_cli:
+  vol_cta:
+  vol_trx:
+  vol_not:
